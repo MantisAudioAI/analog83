@@ -71,7 +71,8 @@ Measured on the demo beat (x86, Release build, stereo, 48 kHz):
 - **Sleeps when idle:** when nothing has sounded for 0.25 s the whole bus stops
   processing; the next hit wakes it instantly. (The tape hiss stops in silence.)
 - **No allocations on the audio thread:** everything (89 KB total) is
-  allocated in `prepare()`. Checked over 2,400 callbacks with odd block sizes.
+  allocated in `prepare()`. Checked over 3,000 callbacks with odd block sizes
+  (1, 256 and 4096 samples), including mode switches and ROOM changes mid-run.
 - **Lock-free:** the UI never blocks the audio thread (atomics plus a
   single-producer/single-consumer trigger queue).
 - **Cheap where it counts:** compressor gain math at control rate (every 8
@@ -97,8 +98,8 @@ The engine is sound only: tempo and patterns come from the host's sequencer
 | Folder | What it is | Goes into the KICK PR? |
 |---|---|---|
 | `drumsynth/` | The engine (see `drumsynth/README.md`) | **Yes**, as `Kick/modules/engine/objects/drumsynth/` |
-| `tools/` | `analog83_tests` (test suite), `analog83_test` (WAV renderer), `analog83_bench` (CPU benchmark), `Analog83DemoPattern.h` (a demo beat standing in for KICK's sequencer), `Analog83Renders.h` (the demo sounds both the renderer and the tests use) | No, stays in your fork |
-| `app/` | **Analog83 Preview**: the neon kit page at KICK's 1024 x 600 size (JUCE) | No, stays in your fork |
+| `tools/` | `analog83_tests` (test suite), `analog83_test` (WAV renderer), `analog83_bench` (CPU benchmark), `Analog83DemoPattern.h` (a demo beat standing in for KICK's sequencer), `Analog83Renders.h` (the demo sounds both the renderer and the tests use) | No, stays in this repo |
+| `app/` | **Analog83 Preview**: the neon kit page at KICK's 1024 x 600 size (JUCE) | No, stays in this repo |
 | `integration/` | Draft for the follow-up PR: Analog '83 as a KICK Plugin program (`MTPluginProgram` + `DrumSynthProgram`), written against the real KICK source | Not yet (second PR) |
 | `docs/` | Developer notes | No |
 | `renders/` | Demo WAV files | No (attach to GitHub comments instead) |
@@ -144,7 +145,7 @@ The committed fingerprints were made with GCC on x86. If the first run in Visual
 To build only the WAV test (no JUCE download), set the CMake option `A83_BUILD_APP` to `OFF`,
 or from a *Developer Command Prompt*:
 
-    cl /std:c++17 /O2 /EHsc src\*.cpp /Fe:analog83_test.exe
+    cl /std:c++17 /O2 /EHsc /I drumsynth /I tools drumsynth\*.cpp tools\analog83_test.cpp /Fe:analog83_test.exe
     analog83_test.exe
 
 ## Using the preview app

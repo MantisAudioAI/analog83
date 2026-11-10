@@ -1,0 +1,15 @@
+# Visual Studio and CMake build output
+out/
+build*/
+.vs/
+CMakeSettings.json
+*.user
+
+# Local test renders (the demo WAVs in renders/ are kept on purpose)
+renders-windows/
+
+# Local binaries
+analog83_test
+*.exe
+*.obj
+*.pdb
